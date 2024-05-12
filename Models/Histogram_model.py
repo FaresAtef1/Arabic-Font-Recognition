@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import pickle
 
-num_of_centroids=4000
-num_samples=600
+num_of_centroids=1
+num_samples=1
 
 def remove_noise (image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
