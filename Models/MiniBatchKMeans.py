@@ -6,13 +6,12 @@ import random
 from PIL import Image
 from skimage.filters import unsharp_mask
 
-num_of_centroids=4096
+num_of_centroids=5000
 num_train_samples=500
-num_test_samples=125
+num_test_samples=int(0.2*num_train_samples)
 K = 11
 all_image_idx=random.sample(range(0,1000),num_train_samples+num_test_samples)
-
-all_image_idx=random.sample(range(0,999),num_train_samples+num_test_samples)
+file = open('myfile.txt', 'a')
 
 def remove_noise (image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -22,6 +21,14 @@ def remove_noise (image):
     result_2 = np.uint8(result_2)
     sharpen = cv2.Canny(result_2, 100,250)
     return sharpen
+
+def find_min_distance(lst):
+    sorted_lst = np.sort((lst))[0]
+    min_diff=100
+    for i in range(3):
+        if min_diff<abs(sorted_lst[i]-sorted_lst[i+1]):
+            min_diff=(sorted_lst[i]-sorted_lst[i+1])
+    return min_diff
 
 def predict(path,centroids,centroids_labels):
     image=cv2.imread(path)
@@ -33,9 +40,8 @@ def predict(path,centroids,centroids_labels):
         for des in descriptors:
             idx=kmeans.predict([des])
             dist=np.linalg.norm(des-centroids[idx])
-            if dist == 0:
-                dist = 0.0000001
-            predections+=(centroids_labels[idx]/dist)
+            if(find_min_distance(centroids_labels[idx])>0.1): 
+                predections+=(centroids_labels[idx]/dist)
         return np.argmax(predections)
     else:
         return -1
@@ -100,7 +106,7 @@ desc_labels[num_of_desc[2]:num_of_desc[3]]=3
 # different options for kmeans
 # - mini batches
 # - limiting the number of descriptors
-kmeans=MiniBatchKMeans(n_clusters=num_of_centroids,batch_size=num_of_centroids*1024,max_iter=20).fit(X=all_des)
+kmeans=MiniBatchKMeans(n_clusters=num_of_centroids,batch_size=num_of_centroids,max_iter=20).fit(X=all_des)
 
 
 # for each centroid, calculate how it is near to each label
@@ -125,6 +131,8 @@ for i in range (num_test_samples):
     path="../../fonts-dataset/IBM Plex Sans Arabic/"+rand_idx+".jpeg"
     predicted=predict(path,kmeans.cluster_centers_,centroids_labels)
     print("image",(rand_idx), "type0: ",predicted)
+    line = "image" + str(rand_idx) + "type0: " + str(predicted) + "\n"
+    file.write(line)
     num_right0+=predicted==0
 
 for i in range (num_test_samples):
@@ -132,6 +140,8 @@ for i in range (num_test_samples):
     path="../../fonts-dataset/Lemonada/"+rand_idx+".jpeg"
     predicted=predict(path,kmeans.cluster_centers_,centroids_labels)
     print("image",(rand_idx), "type1: ",predicted)
+    line = "image" + str(rand_idx) + "type1: " + str(predicted) + "\n"
+    file.write(line)
     num_right1+=predicted==1
 
 for i in range (num_test_samples):
@@ -139,6 +149,8 @@ for i in range (num_test_samples):
     path="../../fonts-dataset/Marhey/"+rand_idx+".jpeg"
     predicted=predict(path,kmeans.cluster_centers_,centroids_labels)
     print("image",(rand_idx), "type2: ",predicted)
+    line = "image" + str(rand_idx) + "type2: " + str(predicted) + "\n"
+    file.write(line)
     num_right2+=predicted==2
 
 for i in range (num_test_samples):
@@ -146,6 +158,8 @@ for i in range (num_test_samples):
     path="../../fonts-dataset/Scheherazade New/"+rand_idx+".jpeg"
     predicted=predict(path,kmeans.cluster_centers_,centroids_labels)
     print("image",(rand_idx), "type3: ",predicted)
+    line = "image" + str(rand_idx) + "type3: " + str(predicted) + "\n"
+    file.write(line)
     num_right3+=predicted==3
 
 print(num_right0)
@@ -154,4 +168,5 @@ print(num_right2)
 print(num_right3)
 
 
-print((num_right0+num_right1+num_right2+num_right3)/(4*num_test_samples))
+print(((num_right0+num_right1+num_right2+num_right3)/(4*num_test_samples))*100)
+file.close()
