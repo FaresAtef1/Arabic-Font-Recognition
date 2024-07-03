@@ -1,10 +1,14 @@
+from flask import Flask, request, jsonify
+from gevent.pywsgi import WSGIServer
 import numpy as np
 import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import cv2
 from skimage.filters import unsharp_mask
+from PIL import Image
 
+app = Flask(__name__)
 def remove_noise (image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     X = cv2.bilateralFilter(gray, 15, sigmaColor=10, sigmaSpace=10)
@@ -22,18 +26,31 @@ def predict_rf (descriptors, rf):
         predictions[ind]+=1
     return np.argmax(predictions)
 
-num_train_samples=10
-num_test_samples=int(0.2*num_train_samples)
-sift = cv2.SIFT_create(500)
+rf = pickle.load(open('rf.pk1' , 'rb'))
 
-rf = pickle.load(open('rf-model.pk1' , 'rb'))
+@app.route('/predict_number', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return "No image uploaded", 400
 
-for i in range (num_test_samples):
-    image = cv2.imread("../../fonts-dataset/Scheherazade New/"+str(num_train_samples+i)+".jpeg")
-    print(image.shape)
-    removed_noise = remove_noise(image)
+    image_file = request.files['image']
+
+    # Open the image using PIL
+    img = Image.open(image_file)
+
+    # Convert the image to a numpy array
+    img_array = np.array(img)
+
+    removed_noise = remove_noise(img_array)
+    sift = cv2.SIFT_create(500)
     kp , descriptors= sift.detectAndCompute(removed_noise,None)
     if descriptors is not None:
         predic = predict_rf(descriptors, rf)
-        # num_right3 += predic==3
-        print("processing type 3 image"+str(num_train_samples+i)+" is "+str(predic))
+    else :
+        predic =0
+
+    return str(predic)
+
+if __name__ == '__main__':
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
