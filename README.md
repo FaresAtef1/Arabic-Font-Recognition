@@ -38,9 +38,9 @@ In our performance analysis, we first partitioned the data into training and tes
 |        Model      |        Accuracy        |
 |-------------------|------------------------|
 | SVM + Histogram   |  78.38%                |
-| SVM               |                        |
-| KNN               |                        |
-| Random Forest     |                        |
+| SVM               |  87.88%                |
+| KNN               |  98%                   |
+| Random Forest     |  98.5%                 |
 
 ## Deployment
 To streamline the testing process, we deployed our module on Azure and made it accessible through a public API using Flask. This deployment allowed for convenient and efficient testing of our models.
