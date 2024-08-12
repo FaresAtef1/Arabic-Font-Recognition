@@ -35,12 +35,12 @@ Each model was rigorously evaluated for computational efficiency, predictive acc
 
 ## Performance Analysis Module
 In our performance analysis, we first partitioned the data into training and testing sets with an 80:20 ratio. We then trained our models on the training data and evaluated their predictions using the test data. You can access the dataset used for this analysis [here](https://www.kaggle.com/datasets/breathemath/fonts-dataset-cmp).
-|        Model      |        Accuracy        |
-|-------------------|------------------------|
-| SVM + Histogram   |  78.38%                |
-| SVM               |  87.88%                |
-| KNN               |  98%                   |
-| Random Forest     |  98.5%                 |
+|        Model      |   Feature Extraction Method |        Accuracy        |
+|-------------------|-----------------------------|------------------------|
+| SVM               |  Histogram                  | 78.38%                 |
+| SVM               |  SIFT                       | 87.88%                 |
+| KNN               |  SIFT                       | 98%                    |
+| Random Forest     |  SIFT                       | 98.5%                  |
 
 ## Deployment
 To streamline the testing process, we deployed our module on Azure and made it accessible through a public API using Flask. This deployment allowed for convenient and efficient testing of our models.
