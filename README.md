@@ -34,7 +34,7 @@ In our detailed model selection process, we examined various methodologies, incl
 Each model was rigorously evaluated for computational efficiency, predictive accuracy, and scalability. Ultimately, we chose Random Forest due to its superior accuracy.
 
 ## Performance Analysis Module
-In our performance analysis, we first partitioned the data into training and testing sets with an 80:20 ratio. We then trained our models on the training data and evaluated their predictions using the test data.
+In our performance analysis, we first partitioned the data into training and testing sets with an 80:20 ratio. We then trained our models on the training data and evaluated their predictions using the test data. You can access the dataset used for this analysis [here](https://www.kaggle.com/datasets/breathemath/fonts-dataset-cmp).
 |        Model      |        Accuracy        |
 |-------------------|------------------------|
 | SVM + Histogram   |  78.38%                |
